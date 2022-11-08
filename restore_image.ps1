@@ -57,7 +57,7 @@ if ( $imageType -eq "ffu") {
     }
 
     applyWIM @doImage
-    setboot -sysLtr $sysLetter -osLtr $osLetter
+    setboot -sysLtr $sysLetter -os $osLetter
     
 } elseif ( $imageType -eq "swm") {
     if ([string]::IsNullOrEmpty($diskPartScriptPath)) {
