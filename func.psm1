@@ -52,11 +52,11 @@ function applySWM {
 function doPartition{
     [CmdletBinding()] 
     param(
-        [string]$diskNum = 0
+        [string]$diskNum
     )
 
     $diskpart = @"
-select disk {$diskNum}
+select disk ${diskNum}
 clean
 convert gpt
 create partition efi size=500
@@ -71,7 +71,7 @@ list volume
 exit
 "@
 
-$diskpart = $diskpart -f $diskNum
+
 $diskpart | diskpart
 catchExitCode
 
