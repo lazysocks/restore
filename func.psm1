@@ -27,10 +27,11 @@ function applyWIM {
     param(
         [string]$imagePath,
         [string]$imageName,
+        [string]$imageType,
         [string]$driveLetter,
         [string]$indexNum
     )
-    $path_to_file = $imagePath + "\" + $imageName + ".wim"
+    $path_to_file = $imagePath + "\" + $imageName + ".${imageType}"
     dism /apply-image /imagefile:$path_to_file /index:${indexNum} /applydir:${driveLetter}:\
     catchExitCode
 }

@@ -36,7 +36,7 @@ if ( $imageType -eq "ffu") {
 
     
 
-} elseif ( $imageType -eq "wim") or ($imageType -eq "esd") {
+} elseif ( $imageType -eq "wim" -or $imageType -eq "esd") {
     if ([string]::IsNullOrEmpty($diskPartScriptPath)) {
 
         doPartition $diskNum
@@ -52,6 +52,7 @@ if ( $imageType -eq "ffu") {
     $doImage = @{
         imagePath = $imagePath
         imageName = $imageName
+        imageType = $imageType
         driveLetter = $osLetter
         indexNum = $indexNum
     }
