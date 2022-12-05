@@ -7,7 +7,7 @@ function catchExitCode{
     }
 }
 
-
+$ErrorActionPreference = 'Stop'
 function applyFFU{
     [CmdletBinding()] 
     param(
@@ -18,7 +18,7 @@ function applyFFU{
 
     $path_to_file = $imagePath + "\" + $imageName + ".ffu"
     dism /apply-ffu /imagefile:$path_to_file /ApplyDrive:\\.\PhysicalDrive${diskNum}
-    catchExitCode
+    
   
 }
 
@@ -95,5 +95,12 @@ function setboot{
     catchExitCode
     bcdedit /set "{default}" osdevice partition=${os}:
     catchExitCode
+
+}
+
+function get_total_time($start_time, $end_time){
+    $elapsed = $end_time - $start_time
+    $total_time = "{0:d2}:{1:d2}:{2:d2} seconds total elapsed time" -f $elapsed.Hours, $elapsed.Minutes, $elapsed.Seconds
+    $total_time
 
 }

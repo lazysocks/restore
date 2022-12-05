@@ -12,12 +12,37 @@ Param(
 [string]$diskPartScriptPath
 )
 Import-Module $PSScriptRoot\func.psm1
+Import-Module $PSScriptRoot\imageAction.psm1
 
+$api_url = "http://172.18.179.4/sysdb/"
+$ErrorActionPreference = 'Stop'
 $start_time = Get-Date
 $len = $imageFile.Length
 $len = $len - 4
 $imageName = $imageFile.Remove($len,4)
 $imageType = $imageFile.Substring($imageFile.Length - 3)
+
+
+$log = @{
+    api_url = $api_url
+    imagePath = $imagePath
+    imageName = $imageName
+    imageType = $imageType
+
+}
+
+function check_code($LASTEXITCODE) {
+    $end_time = Get-Date
+    If ($LASTEXITCODE -ne 0){
+        $log.total_time = get_total_time $start_time $end_time
+        $log.completed = $False
+        doImageLog @log
+        Pause
+        exit
+    }
+    
+}
+
 
 Write-Host $imageName
 Get-Date -Format "dd/MM/yyyy HH:mm:ss"
@@ -30,7 +55,17 @@ if ( $imageType -eq "ffu") {
         diskNum = $diskNum
     }
 
-    applyFFU @doImage
+    
+    applyFFU @doImage 
+    check_code $LASTEXITCODE
+
+
+        
+        
+        
+        
+
+   
    
 
 
@@ -40,12 +75,14 @@ if ( $imageType -eq "ffu") {
     if ([string]::IsNullOrEmpty($diskPartScriptPath)) {
 
         doPartition $diskNum
+        check_code $LASTEXITCODE
 
     } else {
 
         $diskpart = Get-Content -Path $diskPartScriptPath
         $diskpart = $diskpart -f $diskNum
         $diskpart | diskpart
+        check_code $LASTEXITCODE
 
     }
 
@@ -58,18 +95,22 @@ if ( $imageType -eq "ffu") {
     }
 
     applyWIM @doImage
+    check_code $LASTEXITCODE
     setboot -sysLtr $sysLetter -os $osLetter
-    
+    check_code $LASTEXITCODE
+
 } elseif ( $imageType -eq "swm") {
     if ([string]::IsNullOrEmpty($diskPartScriptPath)) {
 
         doPartition $diskNum
+        check_code $LASTEXITCODE
 
     } else {
 
         $diskpart = Get-Content -Path $diskPartScriptPath
         $diskpart = $diskpart -f $diskNum
         $diskpart | diskpart
+        check_code $LASTEXITCODE
 
     }
 
@@ -81,7 +122,10 @@ if ( $imageType -eq "ffu") {
     }
 
     applySWM @doImage
+    check_code $LASTEXITCODE
     setboot -sysLtr $sysLetter -os $osLetter
+    check_code $LASTEXITCODE
+    
 
 }
 
@@ -92,13 +136,10 @@ if ( $imageType -eq "ffu") {
 
 Get-Date -Format "dd/MM/yyyy HH:mm:ss"
 
-
-
-
-$end_time = Get-Date
-$elapsed = $end_time - $start_time
-
-""
-"{0:d2}:{1:d2}:{2:d2} seconds total elapsed time" -f $elapsed.Hours, $elapsed.Minutes, $elapsed.Seconds
-
+$end_time = Get-Date   
+$msg = get_total_time $start_time $end_time
+$log.total_time = $msg
+$log.completed = $True
+Write-Host $msg
+doImageLog @log 
 pause
