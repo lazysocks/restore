@@ -14,7 +14,7 @@ Param(
 Import-Module $PSScriptRoot\func.psm1
 Import-Module $PSScriptRoot\imageAction.psm1
 
-$api_url = "http://172.18.179.4/sysdb/"
+$api_url = "http://portal.c6.confignet.com/sysdb/"
 $ErrorActionPreference = 'Stop'
 $start_time = Get-Date
 $len = $imageFile.Length
