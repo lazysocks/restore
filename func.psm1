@@ -98,6 +98,38 @@ function setboot{
 
 }
 
+function enable_system_protection {
+    [CmdletBinding()] 
+    param(
+        [string]$os
+    )
+""
+"Enabling System Protection on C:"
+reg load HKLM\image ${os}:\Windows\System32\Config\SOFTWARE
+$path  = "HKLM:\Image\Microsoft\Windows NT\CurrentVersion\SPP\Clients" 
+If (!(Test-Path $path))
+{
+   New-Item -Path $path -Force | Out-Null
+}
+$item  = get-item $path
+$key   = $item | select-object -expandProperty property | select-object -first 1
+if( $key -eq $null )
+{
+   $key = "{09F7EDC5-294E-4180-AF6A-FB0E6A0E9513}"
+}
+$drive = GWMI -namespace root\cimv2 -class win32_volume | where DriveLetter -EQ "${os}:" | select-object -expandProperty DeviceID
+$value = $drive + ":Windows (C%3A)"
+set-itemproperty -Path $path -type multistring -Name $key -Value $value
+$item.Handle.Close()
+$path = $null
+$item = $null
+$key  = $null
+[system.gc]::Collect()
+reg unload HKLM\image
+
+""
+}
+
 function get_total_time($start_time, $end_time){
     $elapsed = $end_time - $start_time
     $total_time = "{0:d2}:{1:d2}:{2:d2} seconds total elapsed time" -f $elapsed.Hours, $elapsed.Minutes, $elapsed.Seconds

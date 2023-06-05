@@ -1,4 +1,22 @@
 
+
+function Get-DeviceCfgID {
+    [CmdletBinding()] 
+    param(
+        [Parameter(Mandatory=$True)]
+        [string]$api_url
+        )
+    
+        $serialnumber = Get-WmiObject win32_bios | Select-Object SerialNumber -ExpandProperty SerialNumber
+        $request_url = $api_url +"api/?system_serial=$serialnumber"
+        $system = Invoke-RestMethod -Uri $request_url -Method Get
+
+        [System.Environment]::SetEnvironmentVariable('DEVICE_PORTAL_ID', $system.results.id) 
+
+}
+
+
+
 function doImageLog {
     [CmdletBinding()] 
     param(

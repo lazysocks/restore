@@ -8,6 +8,7 @@ Param(
 [string]$osLetter = "W",
 [string]$sysLetter = "S",
 [string]$indexNum = "1",
+[bool]$systemProtection = $False,
 [Parameter]
 [string]$diskPartScriptPath
 )
@@ -96,6 +97,10 @@ if ( $imageType -eq "ffu") {
 
     applyWIM @doImage
     check_code $LASTEXITCODE
+    if ($systemProtection) {
+        enable_system_protection -os $osLetter
+        check_code $LASTEXITCODE
+    }
     setboot -sysLtr $sysLetter -os $osLetter
     check_code $LASTEXITCODE
 
@@ -123,6 +128,10 @@ if ( $imageType -eq "ffu") {
 
     applySWM @doImage
     check_code $LASTEXITCODE
+    if ($systemProtection) {
+        enable_system_protection -os $osLetter
+        check_code $LASTEXITCODE
+    }
     setboot -sysLtr $sysLetter -os $osLetter
     check_code $LASTEXITCODE
     
