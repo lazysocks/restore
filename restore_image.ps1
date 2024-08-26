@@ -1,4 +1,5 @@
 # Name of file to use to image with
+[CmdletBinding(DefaultParameterSetName='None')]
 Param(
 [Parameter(Mandatory=$True)]
 [string]$imageFile,
@@ -9,8 +10,13 @@ Param(
 [string]$sysLetter = "S",
 [string]$indexNum = "1",
 [bool]$systemProtection = $False,
-[Parameter]
-[string]$diskPartScriptPath
+[bool]$multidisk = $False,
+[Parameter(Mandatory=$False)]
+[string]$diskPartScriptPath,
+[Parameter(ParameterSetName="Drivers",Mandatory=$False)]
+[switch]$DriverInjection,
+[Parameter(ParameterSetName="Drivers",Mandatory=$True)]
+[string]$DriverFolderName
 )
 Import-Module $PSScriptRoot\func.psm1
 Import-Module $PSScriptRoot\imageAction.psm1
@@ -48,6 +54,11 @@ function check_code($LASTEXITCODE) {
 Write-Host $imageName
 Get-Date -Format "dd/MM/yyyy HH:mm:ss"
 
+if ( $multidisk -eq $True) {
+    display_disks
+    $diskNum = Read-Host "Enter disk number to image"
+}
+
 if ( $imageType -eq "ffu") {
 
     $doImage = @{
@@ -81,7 +92,7 @@ if ( $imageType -eq "ffu") {
     } else {
 
         $diskpart = Get-Content -Path $diskPartScriptPath
-        $diskpart = $diskpart -f $diskNum
+        #$diskpart = $diskpart -f $diskNum
         $diskpart | diskpart
         check_code $LASTEXITCODE
 
@@ -151,4 +162,14 @@ $log.total_time = $msg
 $log.completed = $True
 Write-Host $msg
 doImageLog @log 
+if ($PSBoundParameters.ContainsKey('DriverInjection')) {
+    
+    $doDrivers = @{
+        imagePath = $imagePath
+        DriveLetter = $osLetter
+        DriverFolder = $DriverFolderName
+    }
+    Write-Host "Starting Driver Injection"
+    inject_drivers @doDrivers
+}
 pause

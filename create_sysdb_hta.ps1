@@ -9,6 +9,7 @@ $hta_info = @"
             NAVIGABLE="YES"
             APPLICATION="No"
             ID="ViewSystem"
+            WINDOWSTATE="maximize"
             VERSION="1.0"/>
     </head> 
     <body> 

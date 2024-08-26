@@ -61,5 +61,6 @@ function doImageLog {
     }
 
     Invoke-RestMethod @Params
+    Invoke-Expression -Command "Z:\CfgMenu\Images\restore\sysinfo_only.bat" | Out-Null
   
 }

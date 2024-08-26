@@ -136,3 +136,21 @@ function get_total_time($start_time, $end_time){
     $total_time
 
 }
+
+function display_disks(){
+    python Z:\CfgMenu\python-3.9.1\list_disk.py
+}
+
+function inject_drivers(){
+    [CmdletBinding()] 
+    param(
+        [string]$imagePath,
+        [string]$driverBaseDir = "drivers",
+        [string]$driverFolder,
+        [string]$driveletter
+    )
+    Write-Host "Installing Drivers..."
+    $fullDriverPath = $imagePath + "\" + $driverBaseDir + "\" + $driverFolder
+    dism.exe /Image:${driveletter}:\ /Add-Driver /Driver:$fullDriverPath /ForceUnsigned /recurse
+    
+}
